@@ -71,6 +71,234 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-SpringCloud" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/04/15/SpringCloud/" class="article-date">
+  <time class="dt-published" datetime="2021-04-15T03:44:33.000Z" itemprop="datePublished">2021-04-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/04/15/SpringCloud/">SpringCloud</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h3 id="Spring-Config"><a href="#Spring-Config" class="headerlink" title="Spring Config"></a>Spring Config</h3><hr>
+<p>简单来说就是一个配置中心的服务作为服务端，其他服务作为客户端获取配置信息。</p>
+<p>除了有服务端，另外需要一个仓库来存放这些配置文件，可以用github，svn，数据库，本地等存储。这里用github举例。</p>
+<h4 id="创建config-repo"><a href="#创建config-repo" class="headerlink" title="创建config-repo"></a>创建config-repo</h4><img src="C:\Users\edz\AppData\Roaming\Typora\typora-user-images\image-20210317093516951.png" alt="image-20210317093516951" style="zoom:50%;" />
+
+<p>目录大概这样，link-development，link代表项目名，development代表版本，这里是开发版本，最终客户端获取link的配置时，会把application，link，再加上对应profile的配置合并到一起，如果有重复配置以application为主。</p>
+<h4 id="创建配置中心服务端"><a href="#创建配置中心服务端" class="headerlink" title="创建配置中心服务端"></a>创建配置中心服务端</h4><blockquote>
+<p>applicaiton.yml</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">  application:</span><br><span class="line">    name: config</span><br><span class="line">  profiles:</span><br><span class="line">    active: <span class="string">&quot;development&quot;</span></span><br><span class="line">  cloud:</span><br><span class="line">    config:</span><br><span class="line">      server:</span><br><span class="line">        native:#当spring.profiles.active的取值为native时，表明配置文件在本地</span><br><span class="line">          search-locations: file:/opt/linkflowtech/config-repo/&#123;application&#125;, file:/opt/linkflowtech/config-repo/global</span><br><span class="line">        git:</span><br><span class="line">          uri: https:<span class="comment">//code.aliyun.com/linkflow/config-repo.git</span></span><br><span class="line">          search-paths: &#x27;&#123;application&#125;,global&#x27; #根目录</span><br><span class="line">          username: XXXXXXXX</span><br><span class="line">          password: XXXXXXXX</span><br><span class="line">          force-pull: <span class="keyword">true</span></span><br><span class="line">server:</span><br><span class="line">  port: <span class="number">8888</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>boostrap.yml</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">eureka:</span><br><span class="line">  client:</span><br><span class="line">    enabled: $&#123;REGISTRY_ENABLED:<span class="keyword">false</span>&#125;</span><br><span class="line">    serviceUrl:</span><br><span class="line">      defaultZone: http:<span class="comment">//$&#123;REGISTRY_1_HOST:localhost&#125;:$&#123;REGISTRY_1_PORT:8761&#125;/eureka/,http://$&#123;REGISTRY_2_HOST:localhost&#125;:$&#123;REGISTRY_2_PORT:8762&#125;/eureka/</span></span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: <span class="keyword">true</span></span><br><span class="line">    instance-id: $&#123;spring.application.name&#125;:$&#123;spring.cloud.client.ip-address&#125;:$&#123;server.port&#125;</span><br><span class="line">    statusPageUrlPath: /info</span><br><span class="line">    healthCheckUrlPath: /health</span><br></pre></td></tr></table></figure>
+
+<p>yml中—的作用是用来隔离不同profile的配置</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">  profiles: production, <span class="keyword">native</span></span><br><span class="line">  cloud:</span><br><span class="line">    config:</span><br><span class="line">      server:</span><br><span class="line">        git:</span><br><span class="line">          <span class="keyword">default</span>-label: production</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">spring:</span><br><span class="line">  profiles: validation, ta</span><br><span class="line">  cloud:</span><br><span class="line">    config:</span><br><span class="line">      server:</span><br><span class="line">        git:</span><br><span class="line">          <span class="keyword">default</span>-label: pre-production</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">spring:</span><br><span class="line">  profiles: development, integration, test, performance</span><br><span class="line">  cloud:</span><br><span class="line">    config:</span><br><span class="line">      server:</span><br><span class="line">        git:</span><br><span class="line">          <span class="keyword">default</span>-label: master</span><br></pre></td></tr></table></figure>
+
+<p>启动之后可以在浏览器直接访问。Spring Cloud Config 有它的一套访问规则，我们通过这套规则在浏览器上直接访问就可以。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/&#123;application&#125;/&#123;profile&#125;[/&#123;label&#125;]</span><br><span class="line">/&#123;application&#125;-&#123;profile&#125;.yml</span><br><span class="line">/&#123;label&#125;/&#123;application&#125;-&#123;profile&#125;.yml</span><br><span class="line">/&#123;application&#125;-&#123;profile&#125;.properties</span><br><span class="line">/&#123;label&#125;/&#123;application&#125;-&#123;profile&#125;.properties</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>{application} 就是应用名称，对应到配置文件上来，就是配置文件的名称部分，例如上面的link,linflow。</li>
+<li>{profile} 就是配置文件的版本，对应到配置文件上来就是以 link-{profile}.yml 加以区分，例如link-development.yml、link-integration.yml、link-test.yml等。</li>
+<li>{label} 表示 git 分支，默认是 master 分支，如果项目是以分支做区分也是可以的，那就可以通过不同的 label 来控制访问不同的配置文件。</li>
+</ul>
+<h4 id="创建配置中心客户端，使用配置"><a href="#创建配置中心客户端，使用配置" class="headerlink" title="创建配置中心客户端，使用配置"></a>创建配置中心客户端，使用配置</h4><p>例如这里的link微服务，配置了两个版本的配置，设置了profile为development 设置当前使用的版本，然后会去<a href="http://localhost:8888去找对应的配置。">http://localhost:8888去找对应的配置。</a> 第二个版本设置了spring.cloud.config.discovery.enabled=true，表示将从注册中心发现配置，service-id表示服务名，还需要定义注册中心地址，比如eureka.client.serviceUrl.defaultZone</p>
+<blockquote>
+<p>bootstrap.yml</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">eureka:</span><br><span class="line">  client:</span><br><span class="line">    enabled: $&#123;REGISTRY_ENABLED:<span class="keyword">false</span>&#125;</span><br><span class="line">    serviceUrl:</span><br><span class="line">      defaultZone: http:<span class="comment">//$&#123;REGISTRY_1_HOST:localhost&#125;:$&#123;REGISTRY_1_PORT:8761&#125;/eureka/,http://$&#123;REGISTRY_2_HOST:localhost&#125;:$&#123;REGISTRY_2_PORT:8762&#125;/eureka/</span></span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: <span class="keyword">true</span></span><br><span class="line">    instance-id: $&#123;spring.application.name&#125;:$&#123;spring.cloud.client.ip-address&#125;:$&#123;server.port&#125;</span><br><span class="line">    statusPageUrlPath: /info</span><br><span class="line">    healthCheckUrlPath: /health</span><br><span class="line">    </span><br><span class="line">spring: </span><br><span class="line">  application:</span><br><span class="line">    name: <span class="string">&quot;link&quot;</span></span><br><span class="line">  profiles:</span><br><span class="line">    active: <span class="string">&quot;development&quot;</span></span><br><span class="line">  main:</span><br><span class="line">    allow-bean-definition-overriding: <span class="keyword">true</span></span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">spring:</span><br><span class="line">  profiles: development, integration</span><br><span class="line">  cloud:</span><br><span class="line">    config:</span><br><span class="line">      profile: $&#123;spring.profiles.active&#125;</span><br><span class="line">      uri: http:<span class="comment">//localhost:8888</span></span><br><span class="line">      fail-fast: <span class="keyword">true</span></span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">spring:</span><br><span class="line">  profiles: ta, test, validation, production, performance</span><br><span class="line">  cloud:</span><br><span class="line">    config:</span><br><span class="line">      profile: $&#123;spring.profiles.active&#125;</span><br><span class="line">      discovery:</span><br><span class="line">        enabled: <span class="keyword">true</span></span><br><span class="line">        service-id: config</span><br><span class="line">      fail-fast: <span class="keyword">true</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="服务发现与注册-Eureka"><a href="#服务发现与注册-Eureka" class="headerlink" title="服务发现与注册 Eureka"></a>服务发现与注册 Eureka</h3><h4 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h4><p>引入相关依赖，在启动类上添加注解@EnableEurekaServer，将此项目作为Euraka注册中心。</p>
+<blockquote>
+<p>bootstrap.yml</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">  application:</span><br><span class="line">    name: registry</span><br><span class="line">  profiles:</span><br><span class="line">    active: <span class="string">&quot;development&quot;</span></span><br><span class="line">        </span><br><span class="line">---</span><br><span class="line">spring:</span><br><span class="line">  profiles: development</span><br><span class="line"></span><br><span class="line">eureka:</span><br><span class="line">  client:</span><br><span class="line">    register-with-eureka: <span class="keyword">false</span></span><br><span class="line">    fetch-registry: <span class="keyword">false</span></span><br><span class="line">  instance:</span><br><span class="line">    lease-renewal-interval-in-seconds: <span class="number">10</span></span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">spring:</span><br><span class="line">  profiles: peer1</span><br><span class="line"></span><br><span class="line">eureka:</span><br><span class="line">  instance:</span><br><span class="line">    hostname: registry-<span class="number">1</span></span><br><span class="line">    prefer-ip-address: <span class="keyword">true</span></span><br><span class="line">    instance-id: $&#123;spring.application.name&#125;:$&#123;spring.cloud.client.ip-address&#125;:$&#123;server.port&#125;</span><br><span class="line">  client:</span><br><span class="line">    service-url:</span><br><span class="line">      defaultZone: http:<span class="comment">//$&#123;REGISTRY_2_HOST:localhost&#125;:$&#123;REGISTRY_2_PORT:8762&#125;/eureka/</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>eureka.client.register-with-eureka: false  <strong>禁止自己当做服务注册</strong></p>
+<p>eureka.client.fetch-registry: false  <strong>屏蔽注册信息</strong></p>
+<h4 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h4><p>引入相关依赖，在启动类添加@EnableDiscoveryClient或者@EnableEurekaClient，这两个的区别是后者只能使用Eureka作为注册中心，前者可以使用其他的。</p>
+<blockquote>
+<p>bootstrap.yml</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">eureka:</span><br><span class="line">  client:</span><br><span class="line">    enabled: $&#123;REGISTRY_ENABLED:<span class="keyword">false</span>&#125;</span><br><span class="line">    serviceUrl:</span><br><span class="line">      defaultZone: http:<span class="comment">//$&#123;REGISTRY_1_HOST:localhost&#125;:$&#123;REGISTRY_1_PORT:8761&#125;/eureka/,http://$&#123;REGISTRY_2_HOST:localhost&#125;:$&#123;REGISTRY_2_PORT:8762&#125;/eureka/</span></span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: <span class="keyword">true</span></span><br><span class="line">    instance-id: $&#123;spring.application.name&#125;:$&#123;spring.cloud.client.ip-address&#125;:$&#123;server.port&#125;</span><br><span class="line">    statusPageUrlPath: /info</span><br><span class="line">    healthCheckUrlPath: /health</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="OpenFeign"><a href="#OpenFeign" class="headerlink" title="OpenFeign"></a>OpenFeign</h4><p>核心注解@EnableFeignClients和@FeignClient</p>
+<ul>
+<li>@EnableFeignClients 扫描和注册<code>feign</code>客户端<code>bean</code>定义</li>
+<li>@FeignClient定义一个<code>feign</code>客户端，作为<code>bean</code>注册到容器中</li>
+</ul>
+<p>服务提供者正常写controller</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChannelController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(ChannelController.class);</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@PostMapping(value = &quot;/channels&quot;)</span></span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ChannelDTO <span class="title">save</span><span class="params">(<span class="meta">@RequestBody</span> GeneralChannelDTO channelDTO)</span> </span>&#123;</span><br><span class="line">        LOGGER.info(<span class="string">&quot;&gt;&gt;&gt; request save channel by channelId [&#123;&#125;] type [&#123;&#125;], id [&#123;&#125;]&quot;</span>, channelDTO.getChannelId(), channelDTO.getChannelType(), channelDTO.getId());</span><br><span class="line">        channelDTO = channelService.save(channelDTO);</span><br><span class="line">        <span class="keyword">return</span> channelDTO;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>服务消费者需要定义一个Feign接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient(value = &quot;linkflow&quot;, contextId = &quot;channelFeign&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ChannelFeign</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostMapping(value = &quot;/api/channels&quot;)</span></span><br><span class="line">    <span class="function">GeneralChannel <span class="title">save</span><span class="params">(<span class="meta">@RequestBody</span> GeneralChannel channel)</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里定义了一个ChannelFeign接口，声明是linkflow中的服务，contextId为了多个微服务中的方法重名不报错。</p>
+<p>方法名和参数都需要和服务提供者者保持一致，@PostMapping中的就是服务提供者对应的全路径，我们项目中另外还配置了server.servlet.context-path在配置中心里，所以这里的url需要 用context-path加上RequestMapping的全路径。(当时找了好久找不到前面的/api在哪配的。。)</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://groovvy.cn/2021/04/15/SpringCloud/" data-id="cknicb64u0001bsvp4ool1vru" data-title="SpringCloud" class="article-share-link">Share</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringCloud/" rel="tag">SpringCloud</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-Mockito" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/04/15/Mockito/" class="article-date">
+  <time class="dt-published" datetime="2021-04-15T03:42:24.000Z" itemprop="datePublished">2021-04-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/04/15/Mockito/">Mockito</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h4 id="为什么使用"><a href="#为什么使用" class="headerlink" title="为什么使用"></a>为什么使用</h4><hr>
+<p>在进行单元测试的时候，当前测试对象依赖很多其他的类，你需要手动创建出这些依赖对象，这个时候你可以用Mockito来模拟那些依赖的类。</p>
+<p>所谓mock就是创建一个类的虚假对象，用来替换真实对象来达到两个目的:</p>
+<ul>
+<li>验证这个对象的某个方法的调用情况，调用了多少次，参数是什么</li>
+<li>指定这个对象的某些方法的行为，返回特定的值，或者执行特定的动作</li>
+</ul>
+<h4 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h4><hr>
+<p>一般配合junit使用，引入junit和mockito依赖</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">          &lt;groupId&gt;junit&lt;/groupId&gt;</span><br><span class="line">          &lt;artifactId&gt;junit&lt;/artifactId&gt;</span><br><span class="line">          &lt;version&gt;4.12&lt;/version&gt;</span><br><span class="line">          &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">      &lt;/dependency&gt;</span><br><span class="line">      &lt;dependency&gt;</span><br><span class="line">          &lt;groupId&gt;org.mockito&lt;/groupId&gt;</span><br><span class="line">          &lt;artifactId&gt;mockito-core&lt;/artifactId&gt;</span><br><span class="line">          &lt;version&gt;2.7.19&lt;/version&gt;</span><br><span class="line">          &lt;scope&gt;test&lt;/scope&gt;</span><br><span class="line">      &lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<h5 id="验证某些行为"><a href="#验证某些行为" class="headerlink" title="验证某些行为"></a>验证某些行为</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test01</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    List mockList = mock(List.class);</span><br><span class="line">    mockList.add(<span class="number">1</span>);</span><br><span class="line">    mockList.clear();</span><br><span class="line">    verify(mockList).add(<span class="number">1</span>);</span><br><span class="line">    verify(mockList).clear();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>验证mockList有没有执行过add(1)和clear()方法,一旦mock对象被创建了，mock对象会记住所有的交互。</p>
+<h5 id="打桩"><a href="#打桩" class="headerlink" title="打桩"></a>打桩</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Before</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUp</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    userService = mock(UserService.class);</span><br><span class="line">    User user = <span class="keyword">new</span> User(<span class="number">1</span>,<span class="string">&quot;groovvy&quot;</span>);</span><br><span class="line">    when(userService.getUserById(<span class="number">1</span>)).thenReturn(user);</span><br><span class="line">    when(userService.getUserById(<span class="number">2</span>)).thenThrow(<span class="keyword">new</span> Exception(<span class="string">&quot;不存在&quot;</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test02</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    User user1 = userService.getUserById(<span class="number">1</span>);</span><br><span class="line">    assertEquals(<span class="string">&quot;groovvy&quot;</span>,user1.getName());</span><br><span class="line">    User user3 = userService.getUserById(<span class="number">3</span>);</span><br><span class="line">    assertNull(user3);</span><br><span class="line">    User user2 = userService.getUserById(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>mock函数默认返回的是null，一个空的集合或者一个被对象类型包装的内置类型，例如0、false对应的对象类型为Integer、Boolean；你可以指定调用时返回固定的值或者抛出异常等。</p>
+<h5 id="参数匹配器"><a href="#参数匹配器" class="headerlink" title="参数匹配器"></a>参数匹配器</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test03</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    User user = <span class="keyword">new</span> User(<span class="number">1</span>,<span class="string">&quot;abc&quot;</span>);</span><br><span class="line">    when(userService.getUserById(anyInt())).thenReturn(user);</span><br><span class="line">    User user1 = userService.getUserById(<span class="number">999</span>);</span><br><span class="line">    assertEquals(user1.getName(),<span class="string">&quot;abc&quot;</span>);</span><br><span class="line">    assertEquals(user1.getId(),<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="验证函数的确切、最少、从未调用次数"><a href="#验证函数的确切、最少、从未调用次数" class="headerlink" title="验证函数的确切、最少、从未调用次数"></a>验证函数的确切、最少、从未调用次数</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test04</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    List mockList = mock(List.class);</span><br><span class="line">    mockList.add(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    mockList.add(<span class="number">2</span>);</span><br><span class="line">    mockList.add(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    mockList.add(<span class="number">3</span>);</span><br><span class="line">    mockList.add(<span class="number">3</span>);</span><br><span class="line">    mockList.add(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">    verify(mockList).add(<span class="number">1</span>); <span class="comment">//verify默认验证是否执行一次</span></span><br><span class="line">    verify(mockList,times(<span class="number">1</span>)).add(<span class="number">1</span>);</span><br><span class="line">    verify(mockList,times(<span class="number">2</span>)).add(<span class="number">2</span>);</span><br><span class="line">    verify(mockList,times(<span class="number">3</span>)).add(<span class="number">3</span>);</span><br><span class="line">    verify(mockList,never()).add(<span class="string">&quot;999&quot;</span>);</span><br><span class="line"></span><br><span class="line">    verify(mockList,atLeast(<span class="number">1</span>)).add(<span class="number">1</span>);</span><br><span class="line">    verify(mockList,atMost(<span class="number">3</span>)).add(<span class="number">2</span>);</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://groovvy.cn/2021/04/15/Mockito/" data-id="cknicb64o0000bsvpd09v9zqm" data-title="Mockito" class="article-share-link">Share</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" rel="tag">单元测试</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-微信第三方平台对接" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/04/15/%E5%BE%AE%E4%BF%A1%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%8E%A5/" class="article-date">
+  <time class="dt-published" datetime="2021-04-15T03:41:08.000Z" itemprop="datePublished">2021-04-15</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2021/04/15/%E5%BE%AE%E4%BF%A1%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%8E%A5/">微信第三方平台对接</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h4 id="微信第三方平台授权流程梳理"><a href="#微信第三方平台授权流程梳理" class="headerlink" title="微信第三方平台授权流程梳理"></a>微信第三方平台授权流程梳理</h4><hr>
+<ul>
+<li><p>component_verify_ticket ：验证票据，在第三方平台创建审核通过后，微信服务器会向其 ”授权事件接收URL” 每隔 10 分钟以 <code>POST</code> 的方式推送 component_verify_ticket。可用于获取component_access_token</p>
+</li>
+<li><p>component_access_token：第三放平台的access_token,可用于调用第三方平台的api,需要跟authorizer_access_token区别开</p>
+</li>
+<li><p>pre_auth_code：预授权码，通过component_access_token获取，可用于拼接公众号授权给第三方平台的扫码授权页面</p>
+</li>
+<li><p>authorization_code(auth_code)：在公众号同意授权后返回给第三方平台,可用于和component_access_token获取authorizer_access_token和authorizer_refresh_token </p>
+</li>
+<li><p>authorizer_access_token：用于代替授权的公众号去调公众号相关接口</p>
+</li>
+<li><p>authorizer_refresh_token ：用于刷新authorizer_access_token</p>
+</li>
+</ul>
+<p>首先是等待微信推送component_verify_ticket，用ticket获取component_access_token，用access_token获取pre_auth_code</p>
+<p>然后拼接授权页面，授权完成后拿到auth_code。用authorization_code和component_access_token获取authorizer_access_token和</p>
+<p>authorizer_refresh_token </p>
+<p>然后用authorizer_access_token就可以调用公众号相关接口。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://groovvy.cn/2021/04/15/%E5%BE%AE%E4%BF%A1%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%8E%A5/" data-id="cknicb64z0004bsvpbjkj2asp" data-title="微信第三方平台对接" class="article-share-link">Share</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BE%AE%E4%BF%A1/" rel="tag">微信</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-jdk1.8新特性" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2021/04/15/jdk1.8%E6%96%B0%E7%89%B9%E6%80%A7/" class="article-date">
@@ -96,12 +324,9 @@
         <p>JDK1.8新特性</p>
 <hr>
 <ul>
-<li><p><a href="lamba">lambda表达式</a></p>
-</li>
-<li><p><a href="stream">Stream流 API</a></p>
-</li>
-<li><p><a href="func">函数式接口</a></p>
-</li>
+<li><a href="#lamba">lambda表达式</a></li>
+<li><a href="#stream">Stream流 API</a></li>
+<li><a href="#func">函数式接口</a></li>
 </ul>
 <h3 id="lambda表达式"><a href="#lambda表达式" class="headerlink" title="lambda表达式"></a><a id="lamba">lambda表达式</a></h3><hr>
 <p>Lambda表达式的语法总结： () -&gt; ();</p>
@@ -212,13 +437,15 @@
 
 <p>Function.identity() 返回与参数一致的数据，等价于 t -&gt; t </p>
 <p>这里的Stream流是User对象 所以key是每个User的getName()的值，value是每个User对象 </p>
-<h3 id="函数式接口"><a href="#函数式接口" class="headerlink" title=" 函数式接口"></a><a id="stream"> 函数式接口</a></h3><hr>
+<h3 id="函数式接口"><a href="#函数式接口" class="headerlink" title=" 函数式接口"></a><a id="func"> 函数式接口</a></h3><hr>
 <blockquote>
-<p>定义：</p>
 <ol>
-<li>只能有一个抽象方法</li>
-<li>可以有静态方法和默认方法</li>
-<li>可以包含Object里所有能重写的方法</li>
+<li><p>只能有一个抽象方法</p>
+</li>
+<li><p>可以有静态方法和默认方法</p>
+</li>
+<li><p>可以包含Object里所有能重写的方法</p>
+</li>
 </ol>
 </blockquote>
 <p>使用@FunctionalInterface来标识一个接口是函数式接口，用于在编译期间检查接口是否符合函数式接口的语法。</p>
@@ -278,7 +505,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://groovvy.cn/2021/04/15/jdk1.8%E6%96%B0%E7%89%B9%E6%80%A7/" data-id="cknibqhzf00005wvpgifr2ps0" data-title="jdk1.8新特性" class="article-share-link">Share</a>
+      <a data-url="http://groovvy.cn/2021/04/15/jdk1.8%E6%96%B0%E7%89%B9%E6%80%A7/" data-id="cknicb64y0003bsvpefh539p9" data-title="jdk1.8新特性" class="article-share-link">Share</a>
       
       
       
@@ -305,7 +532,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringCloud/" rel="tag">SpringCloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" rel="tag">单元测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BE%AE%E4%BF%A1/" rel="tag">微信</a></li></ul>
     </div>
   </div>
 
@@ -315,7 +542,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Java/" style="font-size: 10px;">Java</a>
+      <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/SpringCloud/" style="font-size: 10px;">SpringCloud</a> <a href="/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size: 10px;">单元测试</a> <a href="/tags/%E5%BE%AE%E4%BF%A1/" style="font-size: 10px;">微信</a>
     </div>
   </div>
 
@@ -335,6 +562,18 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2021/04/15/SpringCloud/">SpringCloud</a>
+          </li>
+        
+          <li>
+            <a href="/2021/04/15/Mockito/">Mockito</a>
+          </li>
+        
+          <li>
+            <a href="/2021/04/15/%E5%BE%AE%E4%BF%A1%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%8E%A5/">微信第三方平台对接</a>
+          </li>
         
           <li>
             <a href="/2021/04/15/jdk1.8%E6%96%B0%E7%89%B9%E6%80%A7/">jdk1.8新特性</a>

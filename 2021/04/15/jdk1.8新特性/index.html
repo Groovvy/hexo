@@ -6,15 +6,15 @@
   
   <title>jdk1.8新特性 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="JDK1.8新特性   lambda表达式  Stream流 API  函数式接口   lambda表达式 Lambda表达式的语法总结： () -&gt; ();    前置 语法    无参数无返回值 () -&gt; System.out.println(“Hello WOrld”)   有一个参数无返回值 (x) -&gt; System.out.println(x)   有且只有一个参数">
+  <meta name="description" content="JDK1.8新特性   lambda表达式 Stream流 API 函数式接口  lambda表达式 Lambda表达式的语法总结： () -&gt; ();    前置 语法    无参数无返回值 () -&gt; System.out.println(“Hello WOrld”)   有一个参数无返回值 (x) -&gt; System.out.println(x)   有且只有一个参数无返回">
 <meta property="og:type" content="article">
 <meta property="og:title" content="jdk1.8新特性">
 <meta property="og:url" content="http://groovvy.cn/2021/04/15/jdk1.8%E6%96%B0%E7%89%B9%E6%80%A7/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="JDK1.8新特性   lambda表达式  Stream流 API  函数式接口   lambda表达式 Lambda表达式的语法总结： () -&gt; ();    前置 语法    无参数无返回值 () -&gt; System.out.println(“Hello WOrld”)   有一个参数无返回值 (x) -&gt; System.out.println(x)   有且只有一个参数">
+<meta property="og:description" content="JDK1.8新特性   lambda表达式 Stream流 API 函数式接口  lambda表达式 Lambda表达式的语法总结： () -&gt; ();    前置 语法    无参数无返回值 () -&gt; System.out.println(“Hello WOrld”)   有一个参数无返回值 (x) -&gt; System.out.println(x)   有且只有一个参数无返回">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-04-15T03:28:24.000Z">
-<meta property="article:modified_time" content="2021-04-15T03:29:23.318Z">
+<meta property="article:modified_time" content="2021-04-15T03:38:37.448Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="Java">
 <meta name="twitter:card" content="summary">
@@ -99,12 +99,9 @@
         <p>JDK1.8新特性</p>
 <hr>
 <ul>
-<li><p><a href="lamba">lambda表达式</a></p>
-</li>
-<li><p><a href="stream">Stream流 API</a></p>
-</li>
-<li><p><a href="func">函数式接口</a></p>
-</li>
+<li><a href="#lamba">lambda表达式</a></li>
+<li><a href="#stream">Stream流 API</a></li>
+<li><a href="#func">函数式接口</a></li>
 </ul>
 <h3 id="lambda表达式"><a href="#lambda表达式" class="headerlink" title="lambda表达式"></a><a id="lamba">lambda表达式</a></h3><hr>
 <p>Lambda表达式的语法总结： () -&gt; ();</p>
@@ -215,13 +212,15 @@
 
 <p>Function.identity() 返回与参数一致的数据，等价于 t -&gt; t </p>
 <p>这里的Stream流是User对象 所以key是每个User的getName()的值，value是每个User对象 </p>
-<h3 id="函数式接口"><a href="#函数式接口" class="headerlink" title=" 函数式接口"></a><a id="stream"> 函数式接口</a></h3><hr>
+<h3 id="函数式接口"><a href="#函数式接口" class="headerlink" title=" 函数式接口"></a><a id="func"> 函数式接口</a></h3><hr>
 <blockquote>
-<p>定义：</p>
 <ol>
-<li>只能有一个抽象方法</li>
-<li>可以有静态方法和默认方法</li>
-<li>可以包含Object里所有能重写的方法</li>
+<li><p>只能有一个抽象方法</p>
+</li>
+<li><p>可以有静态方法和默认方法</p>
+</li>
+<li><p>可以包含Object里所有能重写的方法</p>
+</li>
 </ol>
 </blockquote>
 <p>使用@FunctionalInterface来标识一个接口是函数式接口，用于在编译期间检查接口是否符合函数式接口的语法。</p>
@@ -281,7 +280,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://groovvy.cn/2021/04/15/jdk1.8%E6%96%B0%E7%89%B9%E6%80%A7/" data-id="cknibqhzf00005wvpgifr2ps0" data-title="jdk1.8新特性" class="article-share-link">Share</a>
+      <a data-url="http://groovvy.cn/2021/04/15/jdk1.8%E6%96%B0%E7%89%B9%E6%80%A7/" data-id="cknicb64y0003bsvpefh539p9" data-title="jdk1.8新特性" class="article-share-link">Share</a>
       
       
       
@@ -291,6 +290,20 @@
   </div>
   
     
+<nav id="article-nav">
+  
+    <a href="/2021/04/15/%E5%BE%AE%E4%BF%A1%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%8E%A5/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          微信第三方平台对接
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
   
 </article>
 
@@ -306,7 +319,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/" rel="tag">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringCloud/" rel="tag">SpringCloud</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" rel="tag">单元测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BE%AE%E4%BF%A1/" rel="tag">微信</a></li></ul>
     </div>
   </div>
 
@@ -316,7 +329,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Java/" style="font-size: 10px;">Java</a>
+      <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/SpringCloud/" style="font-size: 10px;">SpringCloud</a> <a href="/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size: 10px;">单元测试</a> <a href="/tags/%E5%BE%AE%E4%BF%A1/" style="font-size: 10px;">微信</a>
     </div>
   </div>
 
@@ -336,6 +349,18 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2021/04/15/SpringCloud/">SpringCloud</a>
+          </li>
+        
+          <li>
+            <a href="/2021/04/15/Mockito/">Mockito</a>
+          </li>
+        
+          <li>
+            <a href="/2021/04/15/%E5%BE%AE%E4%BF%A1%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%8E%A5/">微信第三方平台对接</a>
+          </li>
         
           <li>
             <a href="/2021/04/15/jdk1.8%E6%96%B0%E7%89%B9%E6%80%A7/">jdk1.8新特性</a>
