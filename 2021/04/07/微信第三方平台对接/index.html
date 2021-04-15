@@ -20,15 +20,20 @@
     var CONFIG = {"hostname":"groovvy.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Groovvy Notes">
-<meta property="og:url" content="http://groovvy.cn/tags/SpringCloud/index.html">
+  <meta name="description" content="微信第三方平台授权流程梳理  component_verify_ticket ：验证票据，在第三方平台创建审核通过后，微信服务器会向其 ”授权事件接收URL” 每隔 10 分钟以 POST 的方式推送 component_verify_ticket。可用于获取component_access_token  component_access_token：第三放平台的access_token,可用于调">
+<meta property="og:type" content="article">
+<meta property="og:title" content="微信第三方平台对接">
+<meta property="og:url" content="http://groovvy.cn/2021/04/07/%E5%BE%AE%E4%BF%A1%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%8E%A5/index.html">
 <meta property="og:site_name" content="Groovvy Notes">
+<meta property="og:description" content="微信第三方平台授权流程梳理  component_verify_ticket ：验证票据，在第三方平台创建审核通过后，微信服务器会向其 ”授权事件接收URL” 每隔 10 分钟以 POST 的方式推送 component_verify_ticket。可用于获取component_access_token  component_access_token：第三放平台的access_token,可用于调">
 <meta property="og:locale">
+<meta property="article:published_time" content="2021-04-07T09:56:08.000Z">
+<meta property="article:modified_time" content="2021-04-15T03:48:09.796Z">
 <meta property="article:author" content="Groovvy">
+<meta property="article:tag" content="微信">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://groovvy.cn/tags/SpringCloud/">
+<link rel="canonical" href="http://groovvy.cn/2021/04/07/%E5%BE%AE%E4%BF%A1%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%8E%A5/">
 
 
 <script id="page-configurations">
@@ -36,12 +41,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'cn'
   };
 </script>
 
-  <title>وسم: SpringCloud | Groovvy Notes</title>
+  <title>微信第三方平台对接 | Groovvy Notes</title>
   
 
 
@@ -139,51 +144,107 @@
         <div class="content-wrap">
           
 
-          <div class="content tag">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <h2 class="collection-header">SpringCloud
-          <small>وسم</small>
-        </h2>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="cn">
+    <link itemprop="mainEntityOfPage" href="http://groovvy.cn/2021/04/07/%E5%BE%AE%E4%BF%A1%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%8E%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Groovvy">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Groovvy Notes">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          微信第三方平台对接
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">نُشر في</span>
+
+              <time title="أُنشأ: 2021-04-07 17:56:08" itemprop="dateCreated datePublished" datetime="2021-04-07T17:56:08+08:00">2021-04-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">عُدل في</span>
+                <time title="عُدل: 2021-04-15 11:48:09" itemprop="dateModified" datetime="2021-04-15T11:48:09+08:00">2021-04-15</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
+        <h4 id="微信第三方平台授权流程梳理"><a href="#微信第三方平台授权流程梳理" class="headerlink" title="微信第三方平台授权流程梳理"></a>微信第三方平台授权流程梳理</h4><hr>
+<ul>
+<li><p>component_verify_ticket ：验证票据，在第三方平台创建审核通过后，微信服务器会向其 ”授权事件接收URL” 每隔 10 分钟以 <code>POST</code> 的方式推送 component_verify_ticket。可用于获取component_access_token</p>
+</li>
+<li><p>component_access_token：第三放平台的access_token,可用于调用第三方平台的api,需要跟authorizer_access_token区别开</p>
+</li>
+<li><p>pre_auth_code：预授权码，通过component_access_token获取，可用于拼接公众号授权给第三方平台的扫码授权页面</p>
+</li>
+<li><p>authorization_code(auth_code)：在公众号同意授权后返回给第三方平台,可用于和component_access_token获取authorizer_access_token和authorizer_refresh_token </p>
+</li>
+<li><p>authorizer_access_token：用于代替授权的公众号去调公众号相关接口</p>
+</li>
+<li><p>authorizer_refresh_token ：用于刷新authorizer_access_token</p>
+</li>
+</ul>
+<p>首先是等待微信推送component_verify_ticket，用ticket获取component_access_token，用access_token获取pre_auth_code</p>
+<p>然后拼接授权页面，授权完成后拿到auth_code。用authorization_code和component_access_token获取authorizer_access_token和</p>
+<p>authorizer_refresh_token </p>
+<p>然后用authorizer_access_token就可以调用公众号相关接口。</p>
+
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+    
+    
+    
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2021-03-17T15:11:33+08:00"
-              content="2021-03-17">
-          03-17
-        </time>
-      </div>
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BE%AE%E4%BF%A1/" rel="tag"># 微信</a>
+          </div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/03/17/SpringCloud/" itemprop="url">
-            <span itemprop="name">SpringCloud</span>
-          </a>
-      </div>
+        
 
-    </header>
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/17/SpringCloud/" rel="prev" title="SpringCloud">
+      <i class="fa fa-chevron-left"></i> SpringCloud
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/15/jdk1.8%E6%96%B0%E7%89%B9%E6%80%A7/" rel="next" title="jdk1.8新特性">
+      jdk1.8新特性 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
   </article>
-
-    </div>
-  </div>
   
   
-  
-
   
 
 
@@ -236,6 +297,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BE%AE%E4%BF%A1%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0%E6%8E%88%E6%9D%83%E6%B5%81%E7%A8%8B%E6%A2%B3%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">微信第三方平台授权流程梳理</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
