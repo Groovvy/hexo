@@ -23,27 +23,27 @@
   <meta name="description" content="Quick notes">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Groovvy Notes">
-<meta property="og:url" content="http://groovvy.cn/archives/2021/03/index.html">
+<meta property="og:url" content="http://groovvy.cn/page/2/index.html">
 <meta property="og:site_name" content="Groovvy Notes">
 <meta property="og:description" content="Quick notes">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="Groovvy">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://groovvy.cn/archives/2021/03/">
+<link rel="canonical" href="http://groovvy.cn/page/2/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : false,
+    isHome : true,
     isPost : false,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | Groovvy Notes</title>
+  <title>Groovvy Notes</title>
   
 
 
@@ -146,71 +146,91 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://groovvy.cn/2021/03/16/Mockito/">
 
-  
-  
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 6 篇日志。 继续努力。</span>
-      </div>
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Groovvy">
+      <meta itemprop="description" content="Quick notes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Groovvy Notes">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/16/Mockito/" class="post-title-link" itemprop="url">Mockito</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-16 11:33:24" itemprop="dateCreated datePublished" datetime="2021-03-16T11:33:24+08:00">2021-03-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-15 12:35:55" itemprop="dateModified" datetime="2021-04-15T12:35:55+08:00">2021-04-15</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
+          <h4 id="为什么使用"><a href="#为什么使用" class="headerlink" title="为什么使用"></a>为什么使用</h4><hr>
+<p>在进行单元测试的时候，当前测试对象依赖很多其他的类，你需要手动创建出这些依赖对象，这个时候你可以用Mockito来模拟那些依赖的类。</p>
+<p>所谓mock就是创建一个类的虚假对象，用来替换真实对象来达到两个目的:</p>
+<ul>
+<li>验证这个对象的某个方法的调用情况，调用了多少次，参数是什么</li>
+<li>指定这个对象的某些方法的行为，返回特定的值，或者执行特定的动作</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/16/Mockito/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2021-03-17T15:11:33+08:00"
-              content="2021-03-17">
-          03-17
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/03/17/SpringCloud/" itemprop="url">
-            <span itemprop="name">SpringCloud</span>
-          </a>
-      </div>
-
-    </header>
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
   </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2021-03-16T11:33:24+08:00"
-              content="2021-03-16">
-          03-16
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/03/16/Mockito/" itemprop="url">
-            <span itemprop="name">Mockito</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-
-    </div>
-  </div>
   
   
   
 
+
   
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
 
 
 
