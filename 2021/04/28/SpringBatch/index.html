@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"groovvy.cn","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":"mac","style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Spring Batch 是一个用于创建健壮的批处理应用程序的完整框架。您可以创建可重用的函数来处理大量数据或任务，通常称为批量处理。 如 Spring Batch 文档中所述，使用该框架的最常见方案如下：• 定期提交批处理• 并行处理作业的并发批处理• 分阶段，企业消息驱动处理• 大型并行批处理• 手动或故障后的计划重新启动• 依赖步骤的顺序处理（扩展到工作流程驱动的批处理）• 部分处理：跳过">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBatch">
+<meta property="og:url" content="http://groovvy.cn/2021/04/28/SpringBatch/index.html">
+<meta property="og:site_name" content="Groovvy Notes">
+<meta property="og:description" content="Spring Batch 是一个用于创建健壮的批处理应用程序的完整框架。您可以创建可重用的函数来处理大量数据或任务，通常称为批量处理。 如 Spring Batch 文档中所述，使用该框架的最常见方案如下：• 定期提交批处理• 并行处理作业的并发批处理• 分阶段，企业消息驱动处理• 大型并行批处理• 手动或故障后的计划重新启动• 依赖步骤的顺序处理（扩展到工作流程驱动的批处理）• 部分处理：跳过">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://groovvy.cn/2021/04/28/SpringBatch/springbatch.png">
+<meta property="article:published_time" content="2021-04-28T10:02:07.000Z">
+<meta property="article:modified_time" content="2021-04-28T10:05:54.497Z">
+<meta property="article:author" content="Groovvy">
+<meta property="article:tag" content="Spring">
+<meta property="article:tag" content="SpringBatch">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://groovvy.cn/2021/04/28/SpringBatch/springbatch.png">
+
+<link rel="canonical" href="http://groovvy.cn/2021/04/28/SpringBatch/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SpringBatch | Groovvy Notes</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Groovvy Notes</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://groovvy.cn/2021/04/28/SpringBatch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Groovvy">
+      <meta itemprop="description" content="Quick notes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Groovvy Notes">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SpringBatch
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-04-28 18:02:07 / 修改时间：18:05:54" itemprop="dateCreated datePublished" datetime="2021-04-28T18:02:07+08:00">2021-04-28</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p> <a target="_blank" rel="noopener" href="https://projects.spring.io/spring-batch/">Spring Batch</a> 是一个用于创建健壮的批处理应用程序的完整框架。您可以创建可重用的函数来处理大量数据或任务，通常称为批量处理。</p>
+<p>如 <a target="_blank" rel="noopener" href="https://docs.spring.io/spring-batch/trunk/reference/html/spring-batch-intro.html">Spring Batch 文档</a>中所述，使用该框架的最常见方案如下：<br>• 定期提交批处理<br>• 并行处理作业的并发批处理<br>• 分阶段，企业消息驱动处理<br>• 大型并行批处理<br>• 手动或故障后的计划重新启动<br>• 依赖步骤的顺序处理（扩展到工作流程驱动的批处理）<br>• 部分处理：跳过记录（例如，回滚时）<br>• 整批事务：对于批量小或现有存储过程的情况 / 脚本</p>
+<span id="more"></span>
+
+<p>Spring Batch 的特点有：</p>
+<ol>
+<li> 事务管理，让您专注于业务处理，实现批处理机制，你可以引入平台事务机制或其他事务管理器机制</li>
+<li> 基于块 Chunk 的处理，通过将一大段大量数据分成一段段小数据来处理，。</li>
+<li> 启动 / 停止 / 重新启动 / 跳过 / 重试功能，以处理过程的非交互式管理。</li>
+<li> 基于 Web 的管理界面（Spring Batch Admin），它提供了一个用于管理任务的 API。</li>
+<li> 基于 Spring 框架，因此它包括所有配置选项，包括依赖注入。</li>
+<li> 符合 JSR 352：Java 平台的批处理应用程序。</li>
+<li> 基于数据库管理的批处理，可与 Spring Cloud Task 结合，适合分布式集群下处理。</li>
+<li> 能够进行多线程并行处理，分布式系统下并行处理，变成一种弹性 Job 分布式处理框架。  </li>
+</ol>
+<p>　　Spring 批处理的基本单元是 Job，你需要定义一个 Job 代表一次批处理工作，每个 Job 分很多步骤 step，每个步骤里面有两种处理方式 Tasklet(可重复执行的小任务) 和 Chunk(块)，掌握 Spring Batch 主要是将这几个核心概念搞清楚。</p>
+<p><img src="/2021/04/28/SpringBatch/springbatch.png" alt="springbatch"></p>
+<p>在 SpringBoot 架构下，我们只要做一个 JobConfig 组件作为 <a target="_blank" rel="noopener" href="http://docs.spring.io/spring-batch/trunk/reference/htmlsingle/#domainJobLauncher" title="JobLauncher">JobLauncher</a>，使用 @Configuration 配置，然后完成上图中 Job 和 Step 以及 ItemReader，ItemProcessor 和 ItemWriter，后面这三个分别是存在一个步骤里，用于处理条目的输入读 、处理然后输出写出。至于图中 JobRepository 只要我们在 application.properties 中配置上 datasource，SpringBoot 启动时会自动将 batch 需要的库表导入到数据库中。</p>
+<p>下面我们看一个简单案例如何使用 SpringBatch 的，这个案例功能是从一个 CSV 文件中导入数据到数据库中。</p>
+<p>首先导入 pom.xml:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-batch<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这里使用 MysSQL 作为 Job 仓库，在 application.properties 配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver</span><br><span class="line">spring.datasource.url=jdbc:mysql://localhost:3306/test?characterEncoding=utf8&amp;characterSetResults=utf8&amp;autoReconnect=true&amp;failOverReadOnly=false</span><br><span class="line">spring.datasource.username=root</span><br><span class="line">spring.datasource.password=root</span><br><span class="line"></span><br><span class="line">spring.batch.initialize-schema=ALWAYS //自动建表</span><br><span class="line">spring.batch.job.enabled = false      //项目启动批处理任务不自动运行</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>配置了 spring.batch.initialize-schema 为 always 这样能自动启动时导入批处理需要的数据库表。</p>
+<p>下面实现批处理的配置类 BatchConfig:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableBatchProcessing</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BatchConfig</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">public</span> JobBuilderFactory jobBuilderFactory;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">public</span> StepBuilderFactory stepBuilderFactory;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>开启EnableBatchProcessing 批处理支持</p>
+<p>注入JobBuilderFactory，StepBuilderFactory用于构建Job 和Step</p>
+<p>首先定义一个 Job：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Job <span class="title">importUserJob</span><span class="params">(JobCompletionNotificationListener listener, Step step1)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> jobBuilderFactory.get(<span class="string">&quot;importUserJob&quot;</span>)</span><br><span class="line">    .incrementer(<span class="keyword">new</span> RunIdIncrementer())</span><br><span class="line">    .listener(listener)</span><br><span class="line">    .flow(step1)</span><br><span class="line">    .end()</span><br><span class="line">    .build();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个 Job 名称是 importUserJob，incrementer保证每个批处理任务id唯一，JobCompletionNotificationListener监听整个Job的执行</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JobCompletionNotificationListener</span> <span class="keyword">extends</span> <span class="title">JobExecutionListenerSupport</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger log = LoggerFactory.getLogger(JobCompletionNotificationListener.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    PersonMapper personMapper;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">beforeJob</span><span class="params">(JobExecution jobExecution)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        String param1 = jobExecution.getJobParameters().getString(<span class="string">&quot;param1&quot;</span>);</span><br><span class="line">        log.info(<span class="string">&quot;before Job-----------------[&#123;&#125;]&quot;</span>,param1);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterJob</span><span class="params">(JobExecution jobExecution)</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">&quot;after Job-----------------&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (jobExecution.getStatus() == BatchStatus.COMPLETED) &#123;</span><br><span class="line">            log.info(<span class="string">&quot;!!! JOB FINISHED! Time to verify the results&quot;</span>);</span><br><span class="line"></span><br><span class="line">            Person person1 = personMapper.selectByPrimaryKey(<span class="number">1L</span>);</span><br><span class="line">            log.info(<span class="string">&quot;Found &lt;&quot;</span> + person1 + <span class="string">&quot;&gt; in the database.&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>其中使用了步骤 step1:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Step <span class="title">step1</span><span class="params">(PersonWriter writer, StepListener stepListener)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> stepBuilderFactory.get(<span class="string">&quot;step1&quot;</span>)</span><br><span class="line">    .&lt;Person, Person&gt; chunk(<span class="number">3</span>)</span><br><span class="line">    .reader(reader())</span><br><span class="line">    .processor(processor())</span><br><span class="line">    .writer(writer)</span><br><span class="line">    .listener(stepListener)</span><br><span class="line">    .build();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先是构建了一个名为step1的Step，使用chunk分批处理数据，3个一组，使用reader()读取数据，processor()处理数据,PersonWriter写入数据，StepListener监听Step。</p>
+<p>下面是依次看看输入 处理和输出的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> FlatFileItemReader&lt;Person&gt; <span class="title">reader</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FlatFileItemReaderBuilder&lt;Person&gt;()</span><br><span class="line">    .name(<span class="string">&quot;PeopleItemReader&quot;</span>)</span><br><span class="line">    .resource(<span class="keyword">new</span> ClassPathResource(<span class="string">&quot;sample-data.csv&quot;</span>))</span><br><span class="line">    .delimited()</span><br><span class="line">    .names(<span class="keyword">new</span> String[]&#123;<span class="string">&quot;firstName&quot;</span>, <span class="string">&quot;lastName&quot;</span>&#125;)</span><br><span class="line">    .fieldSetMapper(<span class="keyword">new</span> BeanWrapperFieldSetMapper&lt;Person&gt;() &#123;&#123;</span><br><span class="line">    setTargetType(Person.class);</span><br><span class="line">    &#125;&#125;)</span><br><span class="line">    .build();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>注入处理方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> PersonItemProcessor <span class="title">processor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> PersonItemProcessor();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>PersonItemProcessor  每条数据的处理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PersonItemProcessor</span> <span class="keyword">implements</span> <span class="title">ItemProcessor</span>&lt;<span class="title">Person</span>, <span class="title">Person</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger log = LoggerFactory.getLogger(PersonItemProcessor.class);</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Person <span class="title">process</span><span class="params">(Person people)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> String firstName = people.getFirstName().toUpperCase();</span><br><span class="line">        <span class="keyword">final</span> String lastName = people.getLastName().toUpperCase();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> Person transformedPerson = <span class="keyword">new</span> Person(firstName, lastName);</span><br><span class="line">        log.info(<span class="string">&quot;Converting ([&#123;&#125;]) into ([&#123;&#125;])&quot;</span>,people,transformedPerson);</span><br><span class="line">        <span class="keyword">return</span> transformedPerson;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后写入方法PersonWriter</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PersonWriter</span> <span class="keyword">implements</span> <span class="title">ItemWriter</span>&lt;<span class="title">Person</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(PersonWriter.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    PersonMapper personMapper;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">write</span><span class="params">(List&lt;? extends Person&gt; list)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        LOGGER.info(<span class="string">&quot;Writing to database with &quot;</span> + list.size() + <span class="string">&quot; items.&quot;</span>);</span><br><span class="line">        list.forEach((item)-&gt;&#123;</span><br><span class="line">            personMapper.insert(item);</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>接下来是任务的启动PersonLauncher</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PersonLauncher</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(PersonLauncher.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource(name=&quot;importUserJob&quot;)</span></span><br><span class="line">    Job job;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> JobLauncher jobLauncher;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">launcher</span><span class="params">()</span></span>&#123;</span><br><span class="line">        JobParameters params = <span class="keyword">new</span> JobParametersBuilder()</span><br><span class="line">                .addString(<span class="string">&quot;uuid&quot;</span>, UUID.randomUUID().toString())</span><br><span class="line">                .addString(<span class="string">&quot;param1&quot;</span>,<span class="string">&quot;value1&quot;</span>)</span><br><span class="line">                .addDate(<span class="string">&quot;date&quot;</span>,<span class="keyword">new</span> Date())</span><br><span class="line">                .toJobParameters();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            JobExecution execution = jobLauncher.run(job, params);</span><br><span class="line">            LOGGER.info(<span class="string">&quot;Exit Status : &quot;</span> + execution.getStatus());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (JobParametersInvalidException | JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException ex) &#123;</span><br><span class="line">            ex.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是同一个Job 每一次的启动不可以使用相同的JobParameters，就是说每一次的JobParameters都必须存在一个唯一的参数类似于时间戳 uuid这种，否则执行不了。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="Groovvy 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Groovvy 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
+              <a href="/tags/SpringBatch/" rel="tag"># SpringBatch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/27/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-Java-%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%EF%BC%88%E4%B8%80%EF%BC%89/" rel="prev" title="深入理解 Java 内存模型（一）">
+      <i class="fa fa-chevron-left"></i> 深入理解 Java 内存模型（一）
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Groovvy"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">Groovvy</p>
+  <div class="site-description" itemprop="description">Quick notes</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="sidebar-button motion-element"><i class="fa fa-comment"></i>
+    Chat
+  </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/groovvy" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;groovvy" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:groovvy@126.com" title="E-Mail → mailto:groovvy@126.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Groovvy</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script type="text/javascript"
+color="0,0,255" opacity='0.7' zIndex="-2" count="99" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>
