@@ -152,6 +152,135 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://groovvy.cn/2021/04/15/SpringCloud/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Groovvy">
+      <meta itemprop="description" content="Quick notes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Groovvy Notes">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/04/15/SpringCloud/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-04-15 11:44:33" itemprop="dateCreated datePublished" datetime="2021-04-15T11:44:33+08:00">2021-04-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-10 09:30:52" itemprop="dateModified" datetime="2021-05-10T09:30:52+08:00">2021-05-10</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Spring-Config"><a href="#Spring-Config" class="headerlink" title="Spring Config"></a>Spring Config</h3><hr>
+<p>简单来说就是一个配置中心的服务作为服务端，其他服务作为客户端获取配置信息。</p>
+<p>除了有服务端，另外需要一个仓库来存放这些配置文件，可以用github，svn，数据库，本地等存储。这里用github举例。</p>
+<h4 id="创建config-repo"><a href="#创建config-repo" class="headerlink" title="创建config-repo"></a>创建config-repo</h4><p><img src="/2021/04/15/SpringCloud/image-20210510092102749.png" alt="image-20210510092102749"></p>
+<p>目录大概这样，user-development，user代表项目名，development代表版本，这里是开发版本，最终客户端获取user的配置时，会把application，link，再加上对应profile的配置合并到一起，如果有重复配置以application为主。</p>
+<h4 id="创建配置中心服务端"><a href="#创建配置中心服务端" class="headerlink" title="创建配置中心服务端"></a>创建配置中心服务端</h4><blockquote>
+<p>applicaiton.yml</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">  application:</span><br><span class="line">    name: config</span><br><span class="line">  profiles:</span><br><span class="line">    active: <span class="string">&quot;development&quot;</span></span><br><span class="line">  cloud:</span><br><span class="line">    config:</span><br><span class="line">      server:</span><br><span class="line">        native:#当spring.profiles.active的取值为native时，表明配置文件在本地</span><br><span class="line">          search-locations: file:/opt/linkflowtech/config-repo/&#123;application&#125;, file:/opt/linkflowtech/config-repo/global</span><br><span class="line">        git:</span><br><span class="line">          uri: https:<span class="comment">//github.com/Groovvy/config-repo.git</span></span><br><span class="line">          search-paths: &#x27;&#123;application&#125;,global&#x27; #根目录</span><br><span class="line">          username: XXXXXXXX</span><br><span class="line">          password: XXXXXXXX</span><br><span class="line">          force-pull: <span class="keyword">true</span></span><br><span class="line">server:</span><br><span class="line">  port: <span class="number">8888</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>boostrap.yml</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">eureka:</span><br><span class="line">  client:</span><br><span class="line">    enabled: $&#123;REGISTRY_ENABLED:<span class="keyword">false</span>&#125;</span><br><span class="line">    serviceUrl:</span><br><span class="line">      defaultZone: http:<span class="comment">//$&#123;REGISTRY_1_HOST:localhost&#125;:$&#123;REGISTRY_1_PORT:8761&#125;/eureka/,http://$&#123;REGISTRY_2_HOST:localhost&#125;:$&#123;REGISTRY_2_PORT:8762&#125;/eureka/</span></span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: <span class="keyword">true</span></span><br><span class="line">    instance-id: $&#123;spring.application.name&#125;:$&#123;spring.cloud.client.ip-address&#125;:$&#123;server.port&#125;</span><br><span class="line">    statusPageUrlPath: /info</span><br><span class="line">    healthCheckUrlPath: /health</span><br></pre></td></tr></table></figure>
+
+<p>yml中—的作用是用来隔离不同profile的配置</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">  profiles: production</span><br><span class="line">  cloud:</span><br><span class="line">    config:</span><br><span class="line">      server:</span><br><span class="line">        git:</span><br><span class="line">          <span class="keyword">default</span>-label: production</span><br><span class="line">---</span><br><span class="line">spring:</span><br><span class="line">  profiles: development</span><br><span class="line">  cloud:</span><br><span class="line">    config:</span><br><span class="line">      server:</span><br><span class="line">        git:</span><br><span class="line">          <span class="keyword">default</span>-label: main</span><br></pre></td></tr></table></figure>
+
+<p>启动之后可以在浏览器直接访问。Spring Cloud Config 有它的一套访问规则，我们通过这套规则在浏览器上直接访问就可以。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/&#123;application&#125;/&#123;profile&#125;[/&#123;label&#125;]</span><br><span class="line">/&#123;application&#125;-&#123;profile&#125;.yml</span><br><span class="line">/&#123;label&#125;/&#123;application&#125;-&#123;profile&#125;.yml</span><br><span class="line">/&#123;application&#125;-&#123;profile&#125;.properties</span><br><span class="line">/&#123;label&#125;/&#123;application&#125;-&#123;profile&#125;.properties</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>{application} 就是应用名称，对应到配置文件上来，就是配置文件的名称部分，例如上面的user。</li>
+<li>{profile} 就是配置文件的版本，对应到配置文件上来就是以 user-{profile}.yml 加以区分，例如user-development.yml、link-production.yml等。</li>
+<li>{label} 表示 git 分支，默认是 main分支，如果项目是以分支做区分也是可以的，那就可以通过不同的 label 来控制访问不同的配置文件。</li>
+</ul>
+<h4 id="创建配置中心客户端，使用配置"><a href="#创建配置中心客户端，使用配置" class="headerlink" title="创建配置中心客户端，使用配置"></a>创建配置中心客户端，使用配置</h4><p>例如这里的user微服务，配置了两个版本的配置，设置了profile为development 设置当前使用的版本，然后会去<a href="http://localhost:8888去找对应的配置。">http://localhost:8888去找对应的配置。</a> 第二个版本设置了spring.cloud.config.discovery.enabled=true，表示将从注册中心发现配置，service-id表示服务名，还需要定义注册中心地址，比如eureka.client.serviceUrl.defaultZone</p>
+<blockquote>
+<p>bootstrap.yml</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">eureka:</span><br><span class="line">  client:</span><br><span class="line">    enabled: $&#123;REGISTRY_ENABLED:<span class="keyword">false</span>&#125;</span><br><span class="line">    serviceUrl:</span><br><span class="line">      defaultZone: http:<span class="comment">//$&#123;REGISTRY_1_HOST:localhost&#125;:$&#123;REGISTRY_1_PORT:8761&#125;/eureka/,http://$&#123;REGISTRY_2_HOST:localhost&#125;:$&#123;REGISTRY_2_PORT:8762&#125;/eureka/</span></span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: <span class="keyword">true</span></span><br><span class="line">    instance-id: $&#123;spring.application.name&#125;:$&#123;spring.cloud.client.ip-address&#125;:$&#123;server.port&#125;</span><br><span class="line">    statusPageUrlPath: /info</span><br><span class="line">    healthCheckUrlPath: /health</span><br><span class="line">    </span><br><span class="line">spring: </span><br><span class="line">  application:</span><br><span class="line">    name: <span class="string">&quot;user&quot;</span></span><br><span class="line">  profiles:</span><br><span class="line">    active: <span class="string">&quot;development&quot;</span></span><br><span class="line">  main:</span><br><span class="line">    allow-bean-definition-overriding: <span class="keyword">true</span></span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">spring:</span><br><span class="line">  profiles: development, integration</span><br><span class="line">  cloud:</span><br><span class="line">    config:</span><br><span class="line">      profile: $&#123;spring.profiles.active&#125;</span><br><span class="line">      uri: http:<span class="comment">//localhost:8888</span></span><br><span class="line">      fail-fast: <span class="keyword">true</span></span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">spring:</span><br><span class="line">  profiles: production</span><br><span class="line">  cloud:</span><br><span class="line">    config:</span><br><span class="line">      profile: $&#123;spring.profiles.active&#125;</span><br><span class="line">      discovery:</span><br><span class="line">        enabled: <span class="keyword">true</span></span><br><span class="line">        service-id: config</span><br><span class="line">      fail-fast: <span class="keyword">true</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="服务发现与注册-Eureka"><a href="#服务发现与注册-Eureka" class="headerlink" title="服务发现与注册 Eureka"></a>服务发现与注册 Eureka</h3><h4 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h4><p>引入相关依赖，在启动类上添加注解@EnableEurekaServer，将此项目作为Euraka注册中心。</p>
+<blockquote>
+<p>bootstrap.yml</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">  application:</span><br><span class="line">    name: registry</span><br><span class="line">  profiles:</span><br><span class="line">    active: <span class="string">&quot;development&quot;</span></span><br><span class="line">        </span><br><span class="line">---</span><br><span class="line">spring:</span><br><span class="line">  profiles: development</span><br><span class="line"></span><br><span class="line">eureka:</span><br><span class="line">  client:</span><br><span class="line">    register-with-eureka: <span class="keyword">false</span></span><br><span class="line">    fetch-registry: <span class="keyword">false</span></span><br><span class="line">  instance:</span><br><span class="line">    lease-renewal-interval-in-seconds: <span class="number">10</span></span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">spring:</span><br><span class="line">  profiles: peer1</span><br><span class="line"></span><br><span class="line">eureka:</span><br><span class="line">  instance:</span><br><span class="line">    hostname: registry-<span class="number">1</span></span><br><span class="line">    prefer-ip-address: <span class="keyword">true</span></span><br><span class="line">    instance-id: $&#123;spring.application.name&#125;:$&#123;spring.cloud.client.ip-address&#125;:$&#123;server.port&#125;</span><br><span class="line">  client:</span><br><span class="line">    service-url:</span><br><span class="line">      defaultZone: http:<span class="comment">//$&#123;REGISTRY_2_HOST:localhost&#125;:$&#123;REGISTRY_2_PORT:8762&#125;/eureka/</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>eureka.client.register-with-eureka: false  <strong>禁止自己当做服务注册</strong></p>
+<p>eureka.client.fetch-registry: false  <strong>屏蔽注册信息</strong></p>
+<h4 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h4><p>引入相关依赖，在启动类添加@EnableDiscoveryClient或者@EnableEurekaClient，这两个的区别是后者只能使用Eureka作为注册中心，前者可以使用其他的。</p>
+<blockquote>
+<p>bootstrap.yml</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">eureka:</span><br><span class="line">  client:</span><br><span class="line">    enabled: $&#123;REGISTRY_ENABLED:<span class="keyword">false</span>&#125;</span><br><span class="line">    serviceUrl:</span><br><span class="line">      defaultZone: http:<span class="comment">//$&#123;REGISTRY_1_HOST:localhost&#125;:$&#123;REGISTRY_1_PORT:8761&#125;/eureka/,http://$&#123;REGISTRY_2_HOST:localhost&#125;:$&#123;REGISTRY_2_PORT:8762&#125;/eureka/</span></span><br><span class="line">  instance:</span><br><span class="line">    prefer-ip-address: <span class="keyword">true</span></span><br><span class="line">    instance-id: $&#123;spring.application.name&#125;:$&#123;spring.cloud.client.ip-address&#125;:$&#123;server.port&#125;</span><br><span class="line">    statusPageUrlPath: /info</span><br><span class="line">    healthCheckUrlPath: /health</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="OpenFeign"><a href="#OpenFeign" class="headerlink" title="OpenFeign"></a>OpenFeign</h4><p>核心注解@EnableFeignClients和@FeignClient</p>
+<ul>
+<li>@EnableFeignClients 扫描和注册<code>feign</code>客户端<code>bean</code>定义</li>
+<li>@FeignClient定义一个<code>feign</code>客户端，作为<code>bean</code>注册到容器中</li>
+</ul>
+<p>服务提供者正常写controller</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SysUserController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> SysUserMapper sysUserMapper;</span><br><span class="line">    <span class="meta">@GetMapping(&quot;/list&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;SysUser&gt; <span class="title">list</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        List&lt;SysUser&gt; sysUsers = sysUserMapper.queryAll();</span><br><span class="line">        <span class="keyword">return</span> sysUsers;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>服务消费者需要定义一个Feign接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient(value = &quot;user&quot;, contextId = &quot;SysUserFeign&quot;)</span></span><br><span class="line"><span class="meta">@RequestMapping(value = &quot;/user&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">SysUserFeign</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping(value = &quot;/list&quot;, method = RequestMethod.GET)</span></span><br><span class="line">    <span class="function">List&lt;SysUser&gt; <span class="title">list</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这里定义了一个SysUserFeign接口，声明是user中的服务，contextId为了多个微服务中的方法重名不报错。</p>
+<p>方法名和参数都需要和服务提供者者保持一致，@PostMapping中的就是服务提供者对应的全路径，我们项目中另外还配置了server.servlet.context-path在配置中心里，所以这里的url需要 用context-path加上RequestMapping的全路径。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://groovvy.cn/2021/04/15/jdk1.8%E6%96%B0%E7%89%B9%E6%80%A7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -293,80 +422,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/04/07/%E5%BE%AE%E4%BF%A1%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%8E%A5/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://groovvy.cn/2021/03/17/SpringCloud/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Groovvy">
-      <meta itemprop="description" content="Quick notes">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Groovvy Notes">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/03/17/SpringCloud/" class="post-title-link" itemprop="url">SpringCloud</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-03-17 15:11:33" itemprop="dateCreated datePublished" datetime="2021-03-17T15:11:33+08:00">2021-03-17</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-04-28 18:05:59" itemprop="dateModified" datetime="2021-04-28T18:05:59+08:00">2021-04-28</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="Spring-Config"><a href="#Spring-Config" class="headerlink" title="Spring Config"></a>Spring Config</h3><hr>
-<p>简单来说就是一个配置中心的服务作为服务端，其他服务作为客户端获取配置信息。</p>
-<p>除了有服务端，另外需要一个仓库来存放这些配置文件，可以用github，svn，数据库，本地等存储。这里用github举例。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/03/17/SpringCloud/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -542,7 +597,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
